@@ -1,90 +1,69 @@
-# useThrottle Hook
+# @ehsaneha/react-slot
 
-A lightweight and reusable React hook for throttling function calls in React apps. It ensures a function is invoked at most once in a specified delay period — perfect for optimizing performance in scroll, resize, or rapid input events.
-
----
-
-## 🚀 Installation
-
-```bash
-npm install @ehsaneha/react-throttle
-```
-
-or
-
-```bash
-yarn add @ehsaneha/react-throttle
-```
+A lightweight and flexible React `<Slot>` component that merges props and forwards refs to a single child element — inspired by [Radix UI’s Slot](https://www.radix-ui.com/docs/primitives/utilities/slot).
 
 ---
 
-## 🔧 Usage
+## 📦 Installation
+
+```bash
+npm install @ehsaneha/react-slot
+```
+
+Or
+
+```bash
+yarn add @ehsaneha/react-slot
+```
+
+---
+
+## 🚀 Usage
 
 ```tsx
-import React, { useState } from "react";
-import { useThrottle } from "@ehsaneha/react-throttle";
+import Slot from "@ehsaneha/react-slot";
 
-const ScrollLogger = () => {
-  const throttledLog = useThrottle((val: string) => {
-    console.log("Throttled value:", val);
-  }, 1000); // Run once every 1000ms
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    throttledLog(e.currentTarget.scrollTop.toString());
-  };
-
-  return (
-    <div onScroll={handleScroll} style={{ overflowY: "scroll", height: 200 }}>
-      ...
-    </div>
-  );
-};
+<Slot className="bg-blue-500 p-2" onClick={() => console.log("Parent click")}>
+  <button onClick={() => console.log("Child click")}>Click me</button>
+</Slot>;
 ```
 
+✅ What happens:
+
+- Both `onClick` handlers are triggered
+- `className` and `style` props are merged
+- The `ref` is forwarded to the child element
+
 ---
 
-## 🧠 Hook Signature
+## ✨ Features
 
-```ts
-function useThrottle<T extends (...args: any[]) => void>(
-  callback: T,
-  delay: number
-): T;
+- 🔁 Merges `className`, `style`, and event handlers
+- 🎯 Forwards `ref` to child DOM or `forwardRef` component
+- 🚫 Rejects `React.Fragment` and multiple children (with dev warning)
+- 🪶 Tiny, dependency-free, and tree-shakable
+
+---
+
+## 🧪 Running Tests
+
+```bash
+npm run test
 ```
 
-### Parameters:
+Covers:
 
-- `callback`: The function you want to throttle.
-- `delay`: The minimum time interval (in ms) between function calls.
-
-### Returns:
-
-- A throttled version of your function.
+- Prop and style merging
+- Ref forwarding
+- Invalid child handling
+- Event handler composition
 
 ---
 
-## ✅ Features
+## 🛑 Limitations
 
-- Type-safe and framework-agnostic
-- Debounce alternative for scroll/input/resize
-- Cleans up timers on unmount
-- Compatible with React 18 and 19
-
----
-
-## 🧪 Testing
-
-Tested with `@testing-library/react` and `jest`. Includes:
-
-- Immediate call on first trigger
-- Throttled execution for rapid triggers
-- Proper cleanup on component unmount
-
----
-
-## ✨ Author
-
-Made with ❤️ by [ehsaneha](https://github.com/ehsaneha)
+- Only accepts one valid React element as a child.
+- Ignores and warns about fragments or multiple children.
 
 ---
 
