@@ -1,20 +1,24 @@
-import React, {
+import {
   cloneElement,
   isValidElement,
   ReactElement,
   ReactNode,
   forwardRef,
   Ref,
+  CSSProperties,
+  HTMLAttributes,
+  Fragment,
+  RefObject,
 } from "react";
 
 type MergeProps<T> = {
   [K in keyof T]?: T[K];
 } & {
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };
 
-export interface SlotProps extends React.HTMLAttributes<HTMLElement> {
+export interface SlotProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
 }
 
@@ -51,7 +55,7 @@ const Slot = forwardRef<HTMLElement, SlotProps>(
   ({ children, ...slotProps }, ref) => {
     if (
       !isValidElement(children) ||
-      children.type === React.Fragment ||
+      children.type === Fragment ||
       Array.isArray(children)
     ) {
       if (process.env.NODE_ENV !== "production") {
@@ -69,12 +73,12 @@ const Slot = forwardRef<HTMLElement, SlotProps>(
     // Combine refs (child's ref + forwarded ref)
     function setRefs(node: any) {
       if (typeof ref === "function") ref(node);
-      else if (ref) (ref as React.RefObject<any>).current = node;
+      else if (ref) (ref as RefObject<any>).current = node;
 
       const childRef = child.ref;
       if (typeof childRef === "function") childRef(node);
       else if (childRef && typeof childRef === "object")
-        (childRef as React.RefObject<any>).current = node;
+        (childRef as RefObject<any>).current = node;
     }
 
     return cloneElement(child as ReactElement<any>, {

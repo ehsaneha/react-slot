@@ -1,6 +1,6 @@
 {
   "name": "@ehsaneha/react-slot",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A React <Slot> component that merges props and forwards refs to a single child element, similar to Radix UI’s Slot.",
   "main": "dist/index.js",
   "scripts": {
