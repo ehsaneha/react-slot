@@ -30,8 +30,7 @@
     "javascript",
     "typescript",
     "React",
-    "Custom Hook",
-    "Throttle"
+    "Slot"
   ],
   "author": "ehsaneha",
   "license": "MIT",
