@@ -2,12 +2,11 @@ import {
   cloneElement,
   isValidElement,
   ReactElement,
-  ReactNode,
   forwardRef,
-  Ref,
   CSSProperties,
   HTMLAttributes,
   Fragment,
+  Ref,
   RefObject,
 } from "react";
 
@@ -18,9 +17,7 @@ type MergeProps<T> = {
   style?: CSSProperties;
 };
 
-export interface SlotProps extends HTMLAttributes<HTMLElement> {
-  children: ReactNode;
-}
+export interface SlotProps extends HTMLAttributes<HTMLElement> {}
 
 function mergeProps<P>(
   slotProps: MergeProps<P>,
@@ -51,8 +48,24 @@ function mergeProps<P>(
   return merged;
 }
 
+// Helper to merge two refs (function or object refs)
+function mergeRefs<T>(
+  ref1: Ref<T> | undefined,
+  ref2: Ref<T> | undefined
+): Ref<T> {
+  return (value: T | null) => {
+    if (typeof ref1 === "function") ref1(value);
+    else if (ref1 && typeof ref1 === "object")
+      (ref1 as RefObject<T | null>).current = value;
+
+    if (typeof ref2 === "function") ref2(value);
+    else if (ref2 && typeof ref2 === "object")
+      (ref2 as RefObject<T | null>).current = value;
+  };
+}
+
 const Slot = forwardRef<HTMLElement, SlotProps>(
-  ({ children, ...slotProps }, ref) => {
+  ({ children, ...slotProps }, forwardedRef) => {
     if (
       !isValidElement(children) ||
       children.type === Fragment ||
@@ -66,24 +79,15 @@ const Slot = forwardRef<HTMLElement, SlotProps>(
       return null;
     }
 
-    // Grab the child's existing ref to merge if any
-    const child = children as ReactElement & { ref?: Ref<any> };
-    const mergedProps = mergeProps(slotProps, child.props!);
+    const child = children as ReactElement<any> & { ref?: Ref<HTMLElement> };
+    const mergedProps = mergeProps(slotProps, child.props);
 
-    // Combine refs (child's ref + forwarded ref)
-    function setRefs(node: any) {
-      if (typeof ref === "function") ref(node);
-      else if (ref) (ref as RefObject<any>).current = node;
+    // Merge the forwarded ref and child's original ref
+    const combinedRef = forwardedRef; // mergeRefs(forwardedRef, child.ref);
 
-      const childRef = child.ref;
-      if (typeof childRef === "function") childRef(node);
-      else if (childRef && typeof childRef === "object")
-        (childRef as RefObject<any>).current = node;
-    }
-
-    return cloneElement(child as ReactElement<any>, {
+    return cloneElement(child, {
       ...mergedProps,
-      ref: setRefs,
+      ref: combinedRef,
     });
   }
 );
